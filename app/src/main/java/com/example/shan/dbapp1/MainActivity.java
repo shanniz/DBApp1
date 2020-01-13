@@ -13,6 +13,7 @@ public class MainActivity extends AppCompatActivity {
     EditText mEditTextUsername, mEditTextEmail;
     TextView mTextViewUsername, mTextViewEmail;
     private final DBHelper mydb = DBHelper.getDBHelper(this);
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void getUser(View view) {
-        List<User> users = mydb.getAllManufacturers();
+        List<User> users = mydb.getAllUsers();
         int size = users.size();
         User u = users.get(size-1);
         mTextViewUsername.setText(u.getUsername());

@@ -11,16 +11,17 @@ import java.util.List;
 
 public class DBHelper extends SQLiteOpenHelper {
 
-    private static final String KeyID = "id";
     private static final String DBName = "MyDB";
-    private  static  final String TableName = "users";
-    private  static  final String username = "user_name";
-    private  static  final String useremail = "user_email";
+    private static final String TableName = "users";
+
+    private static final String KeyID = "user_id";
+    private static final String username = "user_name";
+    private static final String useremail = "user_email";
 
     private Context context;
 
     private static DBHelper singleton;
-
+    //utility method to access single class object
     public static DBHelper getDBHelper(Context context) {
         if (singleton == null) {
             singleton = new DBHelper(context);
@@ -34,18 +35,16 @@ public class DBHelper extends SQLiteOpenHelper {
         this.context = context;
     }
 
-    // Create Tables
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String CREATE_TABLE = "CREATE TABLE "+ TableName +"("
+        String CREATE_TABLE_QUERY = "CREATE TABLE "+ TableName +"("
                 + KeyID +" INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + username + " TEXT NOT NULL,"
                 + useremail + "  TEXT"
                 + ")";
-        db.execSQL(CREATE_TABLE);
+        db.execSQL(CREATE_TABLE_QUERY);
     }
 
-    // Upgrading database
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Drop older table if exists
@@ -54,12 +53,15 @@ public class DBHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public void insertUser(String name, String email){
-        SQLiteDatabase db = this.getWritableDatabase();
+    public boolean insertUser(String name, String email){
         ContentValues contentValues = new ContentValues();
         contentValues.put(username, name);
         contentValues.put(useremail, email);
-        db.insert(TableName, null, contentValues);
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.insert(TableName, null,
+                contentValues);
+        return true;
     }
 
     public User getUser(int userId) {
@@ -71,13 +73,16 @@ public class DBHelper extends SQLiteOpenHelper {
 
         if (cursor != null)
             cursor.moveToFirst();
+        else{
+            return null;
+        }
 
-        User u = new User(Integer.parseInt(cursor.getString(0)),
+        return new User(Integer.parseInt(cursor.getString(0)),
                 cursor.getString(1), cursor.getString(2));
-        return u;
+
     }
 
-    public List<User> getAllManufacturers() {
+    public List<User> getAllUsers() {
         List<User> mList = new ArrayList<User>();
         String selectQuery = "SELECT  * FROM " + TableName;
         SQLiteDatabase db = this.getWritableDatabase();
